@@ -3,8 +3,6 @@ pipeline {
     environment {
         AWS_REGION = 'eu-west-2'
         AWS_ACCOUNT_ID = '562834173446'
-        AWS_ACCESS_KEY_ID = credentials('my-aws-access-key')
-        AWS_SECRET_ACCESS_KEY = credentials('my-aws-secret-key')
     }
     stages {
         stage('Checkout') {
@@ -15,16 +13,18 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('e-learning-infrastructure-ecs') {
+                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'my-aws-credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh 'terraform init'
                 }
             }
         }
         stage('Terraform Action') {
             steps {
-                echo "Terraform action is --> ${action}"
-                sh "terraform ${action} --auto-approve -var-file ../prod/terraform.tfvars"
+               
+                    echo "Terraform action is --> ${action}"
+                    sh "terraform ${action} --auto-approve -var-file ../prod/terraform.tfvars"
+                }
             }
         }
     }
 }
-
