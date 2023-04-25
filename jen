@@ -1,0 +1,27 @@
+pipeline {
+  agent any
+
+  environment {
+    AWS_REGION = 'eu-west-2'
+    AWS_ACCESS_KEY_ID = credentials('AKIAYGC4H5YDJTV22OOS')
+    AWS_SECRET_ACCESS_KEY = credentials('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')
+    ECS_CLUSTER = 'ecs_cluster'
+    ECS_SERVICE = 'ecs_service'
+    IMAGE_NAME = '562834173446.dkr.ecr.eu-west-2.amazonaws.com/nginx-image'
+    IMAGE_TAG = 'latest'
+  }
+
+  stages {
+    stage('Deploy to ECS') {
+      steps {
+        script {
+          def ecr_login_cmd = sh(script: "aws ecr get-login --no-include-email --region ${AWS_REGION}", returnStdout: true).trim()
+          sh "${ecr_login_cmd}"
+          sh "docker pull ${IMAGE_NAME}:${IMAGE_TAG}"
+          sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECS_CLUSTER}/${ECS_SERVICE}:${IMAGE_TAG}"
+          sh "aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment --image ${ECS_CLUSTER}/${ECS_SERVICE}:${IMAGE_TAG}"
+        }
+      }
+    }
+  }
+}
