@@ -1,5 +1,11 @@
 pipeline {
     agent any
+    environment {
+        AWS_REGION = 'eu-west-2'
+        AWS_ACCOUNT_ID = '562834173446'
+        AWS_ACCESS_KEY_ID = credentials('my-aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('my-aws-secret-key')
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -21,3 +27,4 @@ pipeline {
         }
     }
 }
+
