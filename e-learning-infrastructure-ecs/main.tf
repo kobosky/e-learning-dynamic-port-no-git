@@ -6,41 +6,41 @@ locals {
 
 #Create vpc module
 module "vpc" {
-  source                       = "../Terraform-modules/vpc"
-  region                       = local.region
-  project_name                 = local.project_name
-  environment                  = local.environment
-  vpc_cidr                     = var.vpc_cidr
-  public_subnet_az1_cidr       = var.public_subnet_az1_cidr
-  public_subnet_az2_cidr       = var.public_subnet_az2_cidr
-  private_subnet_app_az1_cidr  = var.private_subnet_app_az1_cidr
-  private_subnet_app_az2_cidr  = var.private_subnet_app_az2_cidr
+  source                      = "../Terraform-modules/vpc"
+  region                      = local.region
+  project_name                = local.project_name
+  environment                 = local.environment
+  vpc_cidr                    = var.vpc_cidr
+  public_subnet_az1_cidr      = var.public_subnet_az1_cidr
+  public_subnet_az2_cidr      = var.public_subnet_az2_cidr
+  private_subnet_app_az1_cidr = var.private_subnet_app_az1_cidr
+  private_subnet_app_az2_cidr = var.private_subnet_app_az2_cidr
 }
 
 #create nat-gatways
 module "nat_gateway" {
-  source                     = "../Terraform-modules/nat-gateway"
-  project_name               = local.project_name
-  environment                = local.environment
-  public_subnet_az1_id       = module.vpc.public_subnet_az1_id
-  internet_gateway           = module.vpc.internet_gateway
-  public_subnet_az2_id       = module.vpc.public_subnet_az2_id
-  vpc_id                     = module.vpc.vpc_id
-  private_app_subnet_az1_id  = module.vpc.private_app_subnet_az1_id
-  private_app_subnet_az2_id  = module.vpc.private_app_subnet_az2_id
- 
+  source                    = "../Terraform-modules/nat-gateway"
+  project_name              = local.project_name
+  environment               = local.environment
+  public_subnet_az1_id      = module.vpc.public_subnet_az1_id
+  internet_gateway          = module.vpc.internet_gateway
+  public_subnet_az2_id      = module.vpc.public_subnet_az2_id
+  vpc_id                    = module.vpc.vpc_id
+  private_app_subnet_az1_id = module.vpc.private_app_subnet_az1_id
+  private_app_subnet_az2_id = module.vpc.private_app_subnet_az2_id
+
 
 }
 
 # create security groups
 module "security_group" {
-  source       = "../Terraform-modules/security-groups"
-  project_name = local.project_name
-  environment  = local.environment
-  vpc_id       = module.vpc.vpc_id
-  ssh_ip       = var.ssh_ip
+  source            = "../Terraform-modules/security-groups"
+  project_name      = local.project_name
+  environment       = local.environment
+  vpc_id            = module.vpc.vpc_id
+  ssh_ip            = var.ssh_ip
   ingress_from_port = var.ingress_from_port
-  ingress_to_port = var.ingress_to_port
+  ingress_to_port   = var.ingress_to_port
 }
 
 #launch rds instance
@@ -80,9 +80,9 @@ module "application_load_balancer" {
 
 # create ecs task execution role 
 module "ecs_task_execution_role" {
-  source               = "../Terraform-modules/iam-role"
-  project_name         = local.project_name
-  environment          = local.environment
+  source       = "../Terraform-modules/iam-role"
+  project_name = local.project_name
+  environment  = local.environment
 }
 
 # create ecs cluster, task definition and service 
@@ -124,8 +124,8 @@ module "sns" {
   environment  = local.environment
   protocol     = var.protocol
   endpoint     = var.endpoint
-  ecs_cluster = module.ecs.ecs_cluster
-  ecs_service = module.ecs.ecs_service
+  ecs_cluster  = module.ecs.ecs_cluster
+  ecs_service  = module.ecs.ecs_service
 }
 
 # Print the website url
